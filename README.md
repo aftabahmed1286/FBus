@@ -1,3 +1,3 @@
 # FBus
 
-This is a simple SwiftUI app showing train stations.
+This is a simple SwiftUI app showing bus stations.
