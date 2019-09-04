@@ -37,16 +37,14 @@ class NetworkLayer {
             "X-Api-Authentication": "intervIEW_TOK3n"
         ]
         
-        let task = URLSession.shared.dataTask(with: request) {data, response, error -> Void in
-            guard let responseData = data,
-                error == nil  else {
-                    completionHandler(nil, error)
-                    print(error?.localizedDescription ?? "Response Error")
-                    return
+        URLSession.shared.dataTask(with: request){ result in
+            switch result {
+            case .success( _, let data):
+                completionHandler(data, nil)
+            case .failure(let err):
+                completionHandler(nil, err)
             }
-            completionHandler(responseData, nil)
-        }
-        task.resume()
+        }.resume()
         
     }
     
@@ -64,16 +62,55 @@ class NetworkLayer {
         var request = URLRequest(url: url)
         request.httpMethod = method.rawValue
         
-        let task = URLSession.shared.downloadTask(with: request) {url, response, error -> Void in
-            guard let fileUrl = url,
-                error == nil  else {
-                    completionHandler(nil, response, error)
-                    print(error?.localizedDescription ?? "Response Error")
-                    return
+        let task = URLSession.shared.downloadTask(with: request) {result in
+            switch result {
+            case .success( let url, let urlResponse):
+                completionHandler(url, urlResponse, nil)
+            case .failure(let err):
+                completionHandler(nil, nil, err)
             }
-            completionHandler(fileUrl, response, nil)
         }
         task.resume()
+    }
+    
+}
+
+extension URLSession {
+    
+    func dataTask(with request: URLRequest, result: @escaping ( Result<(URLResponse, Data), Error>) -> Void) -> URLSessionDataTask {
+        return dataTask(with: request) { (data, response, error) in
+            if let error = error {
+                result(.failure(error))
+                return
+            }
+            
+            guard let response = response, let data = data else {
+                let error = NSError(domain: "error", code: 0, userInfo: nil)
+                result(.failure(error))
+                return
+            }
+            
+            result(.success((response, data)))
+        }
+    }
+    
+    func downloadTask(with request: URLRequest, result: @escaping ( Result<(URL, URLResponse), Error>) -> Void) -> URLSessionDownloadTask {
+     
+        return downloadTask(with: request) {
+            (url, response, error) -> Void in
+            if let error = error {
+                result(.failure(error))
+                return
+            }
+            
+            guard let response = response, let url = url else {
+                let error = NSError(domain: "error", code: 0, userInfo: nil)
+                result(.failure(error))
+                return
+            }
+            
+            result(.success((url, response)))
+        }
     }
     
 }
