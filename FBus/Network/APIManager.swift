@@ -7,6 +7,10 @@
 
 import Foundation
 
+public enum DataSourceServiceName: String {
+    case stationTimetable = "stationTimetable"
+}
+
 class APIManager {
     
     /**********************************************
@@ -15,13 +19,25 @@ class APIManager {
     
     static let shared: APIManager = APIManager()
     
-    let baseURL = "https://api.mobile.staging.mfb.io"
+    var baseURL: String {
+        guard let host = Bundle.main.infoDictionary?["DataSourceHost"] as? [String: Any],
+            let base = host["baseUrl"] as? String else {
+            return ""
+        }
+        return base
+    }
     
     /**********************************************
      * END POINTS
      **********************************************/
     
-    let stationTimetableEndpoint = "/mobile/v1/network/station/{station_id}/timetable"
+    var stationTimetableEndpoint: String {
+        guard let paths = Bundle.main.infoDictionary?["DataSourcePath"] as? [String: Any],
+            let stationTimetable = paths["stationTimetable"] as? String else {
+            return ""
+        }
+        return stationTimetable
+    }
     
     /**********************************************
      * API REQUEST RESPONSES
@@ -36,6 +52,7 @@ class APIManager {
             APIManager.shared.stationTimetableEndpoint
         urlString = urlString.replacingOccurrences(of: "{station_id}", with: stationId)
             
+        print(urlString)
         
         NetworkLayer.shared.requestData(urlString: urlString,
                                         method: .GET,

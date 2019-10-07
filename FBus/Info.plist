@@ -20,6 +20,16 @@
 	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>DataSourceHost</key>
+	<dict>
+		<key>baseUrl</key>
+		<string>https://api.mobile.staging.mfb.io</string>
+	</dict>
+	<key>DataSourcePath</key>
+	<dict>
+		<key>stationTimetable</key>
+		<string>/mobile/v1/network/station/{station_id}/timetable</string>
+	</dict>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
