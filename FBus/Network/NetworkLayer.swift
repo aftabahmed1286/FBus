@@ -39,7 +39,7 @@ class NetworkLayer {
         
         URLSession.shared.dataTask(with: request){ result in
             switch result {
-            case .success( _, let data):
+            case .success( (_, let data)):
                 completionHandler(data, nil)
             case .failure(let err):
                 completionHandler(nil, err)
@@ -64,7 +64,7 @@ class NetworkLayer {
         
         let task = URLSession.shared.downloadTask(with: request) {result in
             switch result {
-            case .success( let url, let urlResponse):
+            case .success((let url, let urlResponse)):
                 completionHandler(url, urlResponse, nil)
             case .failure(let err):
                 completionHandler(nil, nil, err)
